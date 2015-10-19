@@ -1,4 +1,5 @@
 # Add a declarative step here for populating the DB with movies.
+require 'debugger'
 
 Given /the following movies exist/ do |movies_table|
   movies_table.hashes.each do |movie|
@@ -22,14 +23,28 @@ end
 #  "When I uncheck the following ratings: PG, G, R"
 #  "When I check the following ratings: G"
 
-When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
-  # HINT: use String#split to split up the rating_list, then
-  #   iterate over the ratings and reuse the "When I check..." or
-  #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  flunk "Unimplemented"
+When /I (un)?check the following ratings: (.*)/ do |should_uncheck, rating_list|
+  rating_list.split(",").each do |rating|
+    if should_uncheck
+      uncheck("ratings[#{rating}]")
+    else
+      check("ratings[#{rating}]")
+    end
+  end
 end
 
 Then /I should see all the movies/ do
-  # Make sure that all the movies in the app are visible in the table
-  flunk "Unimplemented"
+  Movie.all.each do |movie|
+    page.should have_content(movie.title)
+  end
+end
+
+Then /I should (not )?see movies from the following ratings: (.*)/ do |should_not_see, rating_list|
+  Movie.where(rating: rating_list.split(",")).each do |movie|
+    if(should_not_see)
+      page.should_not have_content(movie.title)
+    else
+      page.should have_content(movie.title)
+    end
+  end
 end
