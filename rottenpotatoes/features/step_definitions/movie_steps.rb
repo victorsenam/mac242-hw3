@@ -16,7 +16,13 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  flunk "Unimplemented"
+  content = page.body
+  position1 = (content =~ Regexp.new(e1))
+  position2 = (content =~ Regexp.new(e2))
+
+  position1.should_not be nil
+  position2.should_not be nil
+  position1.should be < position2
 end
 
 # Make it easier to express checking or unchecking several boxes at once
